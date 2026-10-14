@@ -3,7 +3,9 @@
 #   this repo's DEPLOY_KEY secret, so it never rides along in a commit or a chat. The endpoint checks the
 #   hash before touching anything, so a bad upload just fails here and the site stays as it was.
 name: Deploy to shyonsol.io
+#MC 2026-10-14 workflow_dispatch so a deploy can also be fired by hand from the Actions tab (re-deploys the newest zip)
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths: ['*.zip']
