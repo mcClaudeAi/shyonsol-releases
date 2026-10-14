@@ -1,0 +1,28 @@
+#MC 2026-10-14 the hands-off half of pull deploys. A push that adds a release zip makes this job call
+#   api/deploy-pull.php on shyonsol.io with the zip's raw link and SHA-256. The deploy key lives only in
+#   this repo's DEPLOY_KEY secret, so it never rides along in a commit or a chat. The endpoint checks the
+#   hash before touching anything, so a bad upload just fails here and the site stays as it was.
+name: Deploy to shyonsol.io
+on:
+  push:
+    branches: [main]
+    paths: ['*.zip']
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Call pull deploy
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          #MC 2026-10-14 the zip this push added, else the newest one in the repo
+          Z=$(git diff-tree --no-commit-id --name-only -r HEAD | grep '\.zip$' | head -1)
+          [ -n "$Z" ] || Z=$(ls -t *.zip | head -1)
+          [ -n "$Z" ] || { echo "no zip in this push"; exit 1; }
+          SHA=$(sha256sum "$Z" | cut -d' ' -f1)
+          U="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/${Z}"
+          echo "deploying $Z ($SHA)"
+          R=$(curl -s https://shyonsol.io/api/deploy-pull.php --data-urlencode "k=${DEPLOY_KEY}" --data-urlencode "u1=${U}" --data-urlencode "sha=${SHA}")
+          echo "$R"
+          echo "$R" | grep -q '"ok":true'
