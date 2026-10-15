@@ -52,7 +52,8 @@ jobs:
       - name: Report a failure
         if: failure()
         run: |
-          for f in bw-update.log bw-build.log; do [ -f "$f" ] && echo "::error title=$f::$(tail -c 1800 $f | tr '\n' ' ' | sed 's/%/%25/g')"; done; true
+          for f in bw-update.log bw-build.log; do [ -f "$f" ] && echo "::error title=$f::$(tail -c 1800 $f | tr '\n' ' ' | sed 's/%/%25/g')"; done
+          [ -f bw-build.log ] && echo "::error title=what went wrong::$( (grep -A 14 'What went wrong' bw-build.log; grep -iE '^e: |error:|\bfailed\b' bw-build.log | head -20) | head -c 3500 | tr '\n' ' ' | sed 's/%/%25/g')"; true
       - name: Release
         env:
           GH_TOKEN: ${{ github.token }}
