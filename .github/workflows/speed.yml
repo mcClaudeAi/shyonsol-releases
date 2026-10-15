@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['checks/speed-urls.txt']
+    paths: ['checks/speed-urls.txt', 'checks/speed.sh']
 permissions:
   contents: write
 jobs:
@@ -16,29 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm i -g lighthouse@12.6.0
-      - run: |
-          echo "# $(date -u +%FT%TZ) $(tail -1 checks/speed-urls.txt)" > checks/speed-result.txt
-          for u in $(grep -v '^#' checks/speed-urls.txt); do
-            for i in 1 2 3; do
-              rm -f /tmp/r$i.json
-              CHROME_PATH=$(command -v google-chrome || command -v chromium || command -v chromium-browser) lighthouse "$u" --only-categories=performance --chrome-flags="--headless=new --no-sandbox" --output=json --output-path=/tmp/r$i.json --quiet || echo "run $i failed"
-            done
-            python3 - "$u" >> checks/speed-result.txt <<'PY'
-          import json, sys
-          rs = []
-          for i in (1, 2, 3):
-              try: rs.append(json.load(open('/tmp/r%d.json' % i)))
-              except Exception: pass
-          if not rs:
-              print(sys.argv[1], 'no result'); sys.exit(0)
-          rs.sort(key=lambda r: r['categories']['performance']['score'] or 0)
-          r = rs[len(rs) // 2]
-          a = r['audits']
-          print(sys.argv[1], 'score', round((r['categories']['performance']['score'] or 0) * 100), '| FCP', a['first-contentful-paint']['displayValue'], '| LCP', a['largest-contentful-paint']['displayValue'],
-                '| TBT', a['total-blocking-time']['displayValue'], '| CLS', a['cumulative-layout-shift']['displayValue'], '| SI', a['speed-index']['displayValue'], '| all', [round((x['categories']['performance']['score'] or 0) * 100) for x in rs])
-          PY
-          done
-          cat checks/speed-result.txt
+      - run: bash checks/speed.sh
       - run: |
           git config user.name "speed-check"; git config user.email "speed-check@users.noreply.github.com"
           git add checks/speed-result.txt; git commit -m "Speed check result" || exit 0
