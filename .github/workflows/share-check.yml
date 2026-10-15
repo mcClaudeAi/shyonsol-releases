@@ -1,0 +1,19 @@
+#MC 2026-10-15 checks every share link the way the apps fetch it (see checks/share_check.py) and commits the result
+name: Share card check
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['checks/share-urls.txt', 'checks/share_check.py']
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 checks/share_check.py
+      - run: |
+          git config user.name "share-check"; git config user.email "share-check@users.noreply.github.com"
+          git add checks/share-result.txt; git commit -m "Share card check result" || exit 0
+          git pull --rebase -q && git push
