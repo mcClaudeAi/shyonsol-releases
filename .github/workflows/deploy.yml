@@ -27,11 +27,13 @@ jobs:
           SHA=$(sha256sum "$Z" | cut -d' ' -f1)
           U="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/${Z}"
           echo "deploying $Z ($SHA)"
-          R=$(curl -s https://shyonsol.io/api/deploy-pull.php --data-urlencode "k=${DEPLOY_KEY}" --data-urlencode "u1=${U}" --data-urlencode "sha=${SHA}")
+          R=$(curl -s -D /tmp/h.txt https://shyonsol.io/api/deploy-pull.php --data-urlencode "k=${DEPLOY_KEY}" --data-urlencode "u1=${U}" --data-urlencode "sha=${SHA}")
+          #MC 2026-10-22 the answer's status and where a redirect points, for checks/deploy-last.txt (no body secrets in either)
+          H=$(grep -iE '^(HTTP/|location:|server:|x-|cf-|platform)' /tmp/h.txt | tr -d '\r' | tr '\n' ' ' | head -c 400)
           echo "$R"
           #MC 2026-10-22 the server's answer is kept in the repo too (checks/deploy-last.txt), so a failed deploy says why
           #   without opening the Actions log. The answer never carries the key.
-          echo "$(date -u +%FT%TZ) $Z $(echo "$R" | head -c 600)" > checks/deploy-last.txt
+          echo "$(date -u +%FT%TZ) $Z [$H] $(echo "$R" | head -c 600)" > checks/deploy-last.txt
           git config user.name "deploy"; git config user.email "deploy@users.noreply.github.com"
           git add checks/deploy-last.txt; git commit -q -m "Deploy result" && (git pull --rebase -q && git push -q) || true
           echo "$R" | grep -q '"ok":true'
