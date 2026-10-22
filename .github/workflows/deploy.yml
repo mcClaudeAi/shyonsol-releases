@@ -9,6 +9,8 @@ on:
   push:
     branches: [main]
     paths: ['*.zip']
+permissions:
+  contents: write
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -27,4 +29,9 @@ jobs:
           echo "deploying $Z ($SHA)"
           R=$(curl -s https://shyonsol.io/api/deploy-pull.php --data-urlencode "k=${DEPLOY_KEY}" --data-urlencode "u1=${U}" --data-urlencode "sha=${SHA}")
           echo "$R"
+          #MC 2026-10-22 the server's answer is kept in the repo too (checks/deploy-last.txt), so a failed deploy says why
+          #   without opening the Actions log. The answer never carries the key.
+          echo "$(date -u +%FT%TZ) $Z $(echo "$R" | head -c 600)" > checks/deploy-last.txt
+          git config user.name "deploy"; git config user.email "deploy@users.noreply.github.com"
+          git add checks/deploy-last.txt; git commit -q -m "Deploy result" && (git pull --rebase -q && git push -q) || true
           echo "$R" | grep -q '"ok":true'
