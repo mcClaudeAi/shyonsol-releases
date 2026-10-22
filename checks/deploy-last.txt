@@ -1,4 +1,4 @@
-2026-10-22T20:57:29Z shyonsol-20261022c.zip <html>
+2026-10-22T20:58:57Z shyonsol-20261022c.zip [HTTP/2 307  location: /api/deploy-pull.php server: hcdn x-hcdn-request-id: 360aea72934bf9ad342a4f1d0ef6d41e-bos-edge13 ] <html>
 <head><title>307 Temporary Redirect</title></head>
 <body>
 <center><h1>307 Temporary Redirect</h1></center>
