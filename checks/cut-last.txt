@@ -1,40 +1,61 @@
-2026-10-24T20:46:41Z
-[0;93m2026-10-24 20:43:52.064000454 [W:onnxruntime:Default, device_discovery.cc:95 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
-Downloading data from 'https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx' to file '/home/runner/.u2net/isnet-general-use.onnx'.
-  0%|                                               | 0.00/179M [00:00<?, ?B/s]  6%|██                                    | 9.99M/179M [00:00<00:01, 99.9MB/s] 12%|████▊                                  | 22.0M/179M [00:00<00:01, 112MB/s] 19%|███████▍                               | 33.9M/179M [00:00<00:01, 115MB/s] 26%|██████████                             | 46.2M/179M [00:00<00:01, 118MB/s] 33%|████████████▉                          | 59.5M/179M [00:00<00:00, 123MB/s] 41%|███████████████▊                       | 72.6M/179M [00:00<00:00, 126MB/s] 48%|██████████████████▋                    | 85.6M/179M [00:00<00:00, 127MB/s] 55%|█████████████████████▌                 | 98.9M/179M [00:00<00:00, 129MB/s] 63%|█████████████████████████               | 112M/179M [00:00<00:00, 128MB/s] 70%|████████████████████████████            | 126M/179M [00:01<00:00, 130MB/s] 78%|███████████████████████████████         | 139M/179M [00:01<00:00, 130MB/s] 85%|█████████████████████████████████▉      | 152M/179M [00:01<00:00, 130MB/s] 92%|████████████████████████████████████▉   | 165M/179M [00:01<00:00, 131MB/s]100%|███████████████████████████████████████▉| 178M/179M [00:01<00:00, 131MB/s]  0%|                                               | 0.00/179M [00:00<?, ?B/s]100%|███████████████████████████████████████| 179M/179M [00:00<00:00, 1.25TB/s]
+2026-10-24T23:53:47Z
+/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py:32: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  d = np.array(d, dtype=np.float32)
+/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py:32: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  d = np.array(d, dtype=np.float32)
+/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py:32: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  d = np.array(d, dtype=np.float32)
+/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py:32: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  d = np.array(d, dtype=np.float32)
+/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py:32: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  d = np.array(d, dtype=np.float32)
+/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py:32: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  d = np.array(d, dtype=np.float32)
+/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py:32: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  d = np.array(d, dtype=np.float32)
+/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py:32: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  d = np.array(d, dtype=np.float32)
+/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py:32: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  d = np.array(d, dtype=np.float32)
+/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py:32: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  d = np.array(d, dtype=np.float32)
+/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py:32: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  d = np.array(d, dtype=np.float32)
+/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py:32: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments. To learn more, see the migration guide https://numpy.org/devdocs/numpy_2_0_migration_guide.html#adapting-to-changes-in-the-copy-keyword
+  d = np.array(d, dtype=np.float32)
 to cut: 35
-211 b'{"ok":true,"n":"211","v":"0ef74787"}'
-263 b'{"ok":true,"n":"263","v":"c6f1bda2"}'
-43 b'{"ok":true,"n":"43","v":"a432d25f"}'
-172 b'{"ok":true,"n":"172","v":"ad9bc2e6"}'
-236 b'{"ok":true,"n":"236","v":"391a41b3"}'
-261 b'{"ok":true,"n":"261","v":"a7ae59a8"}'
-957 b'{"ok":true,"n":"957","v":"81d29fa6"}'
-1047 b'{"ok":true,"n":"1047","v":"12309da7"}'
-1223 b'{"ok":true,"n":"1223","v":"e1fda2a4"}'
-57 b'{"ok":true,"n":"57","v":"4ab9dd6c"}'
-60 b'{"ok":true,"n":"60","v":"4b23120a"}'
-1287 b'{"ok":true,"n":"1287","v":"3484f7b9"}'
-612 b'{"ok":true,"n":"612","v":"0112e3bf"}'
-22 b'{"ok":true,"n":"22","v":"91899124"}'
-52 b'{"ok":true,"n":"52","v":"4b53b5ab"}'
-134 b'{"ok":true,"n":"134","v":"d5ef3dae"}'
-138 b'{"ok":true,"n":"138","v":"0bfa2063"}'
-142 b'{"ok":true,"n":"142","v":"f59520e7"}'
-335 b'{"ok":true,"n":"335","v":"4f8f9952"}'
-386 b'{"ok":true,"n":"386","v":"50fb7990"}'
-443 b'{"ok":true,"n":"443","v":"944be1d4"}'
-445 b'{"ok":true,"n":"445","v":"e016df2c"}'
-1207 b'{"ok":true,"n":"1207","v":"f645abbe"}'
-147 b'{"ok":true,"n":"147","v":"c327d055"}'
-37 b'{"ok":true,"n":"37","v":"33215a50"}'
-617 b'{"ok":true,"n":"617","v":"c1c72619"}'
-1179 b'{"ok":true,"n":"1179","v":"686ae738"}'
-1191 b'{"ok":true,"n":"1191","v":"aa6008f6"}'
-54 b'{"ok":true,"n":"54","v":"b66565b6"}'
-160 b'{"ok":true,"n":"160","v":"828965d2"}'
-145 b'{"ok":true,"n":"145","v":"dc348430"}'
-738 b'{"ok":true,"n":"738","v":"f976461d"}'
-934 b'{"ok":true,"n":"934","v":"1461cc2d"}'
-18 b'{"ok":true,"n":"18","v":"57294d51"}'
-181 b'{"ok":true,"n":"181","v":"7bfaf0e4"}'
+211 b'{"ok":true,"n":"211","v":"b414e6df"}'
+263 b'{"ok":true,"n":"263","v":"13dabab4"}'
+43 b'{"ok":true,"n":"43","v":"87e94c6a"}'
+172 b'{"ok":true,"n":"172","v":"b8357ea2"}'
+236 b'{"ok":true,"n":"236","v":"20183b7d"}'
+261 b'{"ok":true,"n":"261","v":"d6f42911"}'
+957 b'{"ok":true,"n":"957","v":"a54c8f3b"}'
+1047 b'{"ok":true,"n":"1047","v":"c60855d9"}'
+1223 b'{"ok":true,"n":"1223","v":"c5ecf5a4"}'
+57 b'{"ok":true,"n":"57","v":"49c6a1e8"}'
+60 b'{"ok":true,"n":"60","v":"3d00c3db"}'
+1287 b'{"ok":true,"n":"1287","v":"1d5dfe42"}'
+612 b'{"ok":true,"n":"612","v":"3c5fc238"}'
+22 b'{"ok":true,"n":"22","v":"b7894794"}'
+52 b'{"ok":true,"n":"52","v":"d2469352"}'
+134 b'{"ok":true,"n":"134","v":"b6feda21"}'
+138 b'{"ok":true,"n":"138","v":"06a98fcb"}'
+142 b'{"ok":true,"n":"142","v":"c19898f3"}'
+335 b'{"ok":true,"n":"335","v":"c9a5a720"}'
+386 b'{"ok":true,"n":"386","v":"47dbb59c"}'
+443 b'{"ok":true,"n":"443","v":"71765383"}'
+445 b'{"ok":true,"n":"445","v":"857836ac"}'
+1207 b'{"ok":true,"n":"1207","v":"cf5f667b"}'
+147 b'{"ok":true,"n":"147","v":"4c965272"}'
+37 b'{"ok":true,"n":"37","v":"d365395c"}'
+617 b'{"ok":true,"n":"617","v":"0af4ff64"}'
+1179 b'{"ok":true,"n":"1179","v":"e17df781"}'
+1191 b'{"ok":true,"n":"1191","v":"40979250"}'
+54 b'{"ok":true,"n":"54","v":"48c57a4a"}'
+160 b'{"ok":true,"n":"160","v":"f494c770"}'
+145 b'{"ok":true,"n":"145","v":"7e48ee46"}'
+738 b'{"ok":true,"n":"738","v":"6bdd5e77"}'
+934 b'{"ok":true,"n":"934","v":"2d9abf1b"}'
+18 b'{"ok":true,"n":"18","v":"19ab9357"}'
+181 b'{"ok":true,"n":"181","v":"f449c8ed"}'
