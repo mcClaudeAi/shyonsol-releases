@@ -23,7 +23,7 @@ jobs:
           if [ "${{ github.event_name }}" != "push" ] || git diff --name-only HEAD~1 HEAD | grep -q 'checks/cut-run.txt'; then echo "m=live" >> "$GITHUB_OUTPUT"; else echo "m=sample" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
-      - run: pip install -q "rembg[cpu]==2.0.59" pillow numpy scipy
+      - run: pip install -q "rembg[cpu]==2.0.59" pillow numpy scipy transformers==4.46.3 torch==2.5.1 --extra-index-url https://download.pytorch.org/whl/cpu
       - name: Sample
         if: steps.mode.outputs.m == 'sample'
         run: |

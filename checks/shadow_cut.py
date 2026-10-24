@@ -19,6 +19,26 @@ def get(url, data=None, headers=None):
     with urllib.request.urlopen(req, timeout=60) as r:
         return r.read()
 
+DEPTH = None
+def depth_model():
+    global DEPTH
+    if DEPTH is None:
+        from transformers import pipeline
+        DEPTH = pipeline('depth-estimation', model='depth-anything/Depth-Anything-V2-Small-hf', device=-1)
+    return DEPTH
+def depth_of(im, al):
+    """a depth map of the figure (near = bright), the background cleared, 256px wide, as a webp"""
+    d = depth_model()(im.convert('RGB').resize((518, 518)))['predicted_depth']
+    d = np.array(d, dtype=np.float32)
+    d = np.array(Image.fromarray(d).resize(im.size, Image.BILINEAR))
+    m = al > 40
+    if m.sum() > 100:
+        lo, hi = np.percentile(d[m], 2), np.percentile(d[m], 98)
+        d = np.clip((d - lo) / max(1e-6, hi - lo), 0, 1)
+    d = (d * 255).astype(np.uint8); d[~m] = 0
+    out = Image.fromarray(d, 'L').resize((256, int(256 * im.height / im.width)), Image.BILINEAR)
+    buf = io.BytesIO(); out.save(buf, 'WEBP', quality=80, method=6); return buf.getvalue()
+
 def cut(raw):
     im = Image.open(io.BytesIO(raw)).convert('RGB').resize((768, 768), Image.LANCZOS)
     out = remove(im, session=SESS, post_process_mask=True)
@@ -31,8 +51,10 @@ def cut(raw):
         sizes = ndimage.sum(solid, lab, range(1, k + 1)); big = sizes.max()
         keep = np.isin(lab, [i + 1 for i, v in enumerate(sizes) if v >= big * .06])
         keep = ndimage.binary_fill_holes(keep)
-        soft = ndimage.binary_dilation(keep, iterations=2)
-        al = np.where(keep, np.maximum(al, 255), np.where(soft, al, 0)).astype(np.uint8)
+        # edge quality: pull the edge in a hair so no background halo rides along, then feather it so it sits in light
+        core = ndimage.binary_erosion(keep, iterations=1)
+        sm = ndimage.gaussian_filter(core.astype(np.float32), 1.1)
+        al = np.clip(sm * 255, 0, 255).astype(np.uint8)
     out = Image.fromarray(np.dstack([np.array(im), al]), 'RGBA')
     a = np.array(out)
     ys, xs = np.where(al > 40)
@@ -59,7 +81,10 @@ def cut(raw):
         out = out.resize((int(out.width * 640 / out.height), 640), Image.LANCZOS)
     buf = io.BytesIO(); out.save(buf, 'WEBP', quality=86, method=6)
     hx = lambda c: '#%02x%02x%02x' % tuple(int(v) for v in c)
-    return buf.getvalue(), {'col': hx(col), 'dark': hx(dark), 'sl': round(float(sl), 3), 'sr': round(float(sr), 3), 'ar': round(out.width / out.height, 4)}, out
+    dep = b''
+    try: dep = depth_of(out, np.array(out)[:, :, 3])
+    except Exception as e: print('depth failed', e)
+    return buf.getvalue(), {'col': hx(col), 'dark': hx(dark), 'sl': round(float(sl), 3), 'sr': round(float(sr), 3), 'ar': round(out.width / out.height, 4), 'depth': bool(dep)}, out, dep
 
 def sample():
     here = os.path.dirname(os.path.abspath(__file__)); od = os.path.join(here, 'cut-sample'); os.makedirs(od, exist_ok=True)
@@ -68,8 +93,9 @@ def sample():
     for r in rows:
         n, url = r[0], r[-1]
         try:
-            data, meta, im = cut(get(url))
+            data, meta, im, dep = cut(get(url))
             open(os.path.join(od, n + '.webp'), 'wb').write(data); info[n] = meta; tiles.append((n, im, meta))
+            if dep: open(os.path.join(od, n + '-d.webp'), 'wb').write(dep)
             print('cut', n, meta, len(data))
         except Exception as e:
             print('FAIL', n, e)
@@ -81,6 +107,8 @@ def sample():
         t = im.copy(); t.thumbnail((cw - 20, ch - 40))
         x, y = (i % W) * cw, (i // W) * ch
         sheet.paste(t, (x + (cw - t.width) // 2, y + 10), t)
+        dp = os.path.join(od, n + '-d.webp')
+        if os.path.exists(dp): dd = Image.open(dp).convert('RGB'); dd.thumbnail((70, 90)); sheet.paste(dd, (x + cw - 80, y + 10))
         d = ImageDraw.Draw(sheet); d.rectangle((x + 10, y + ch - 26, x + 40, y + ch - 8), fill=meta['col']); d.text((x + 50, y + ch - 24), '#' + n, fill=(240, 236, 250))
     sheet.save(os.path.join(od, 'sheet.jpg'), quality=85)
 
@@ -101,9 +129,11 @@ def live():
     rows = todo.get('rows', []); print('to cut:', len(rows))
     for r in rows[:300]:
         try:
-            data, meta, _ = cut(get(r['img']))
+            data, meta, _, dep = cut(get(r['img']))
             open('/tmp/cut.webp', 'wb').write(data)
-            print(r['n'], curl(['-F', 'a=put', '-F', 'k=' + k, '-F', 'n=' + r['n'], '-F', 'meta=' + json.dumps(meta), '-F', 'img=@/tmp/cut.webp;type=image/webp', base])[:120])
+            args = ['-F', 'a=put', '-F', 'k=' + k, '-F', 'n=' + r['n'], '-F', 'meta=' + json.dumps(meta), '-F', 'img=@/tmp/cut.webp;type=image/webp']
+            if dep: open('/tmp/dep.webp', 'wb').write(dep); args += ['-F', 'dep=@/tmp/dep.webp;type=image/webp']
+            print(r['n'], curl(args + [base])[:120])
         except Exception as e:
             print('FAIL', r.get('n'), e)
 
