@@ -7,6 +7,7 @@
 #   and where the shoulders end, so the arms attach at the right place.
 import sys, os, io, json, hmac, hashlib, time, urllib.request, urllib.parse
 import numpy as np
+from scipy import ndimage
 from PIL import Image, ImageDraw
 from rembg import remove, new_session
 
@@ -21,8 +22,19 @@ def get(url, data=None, headers=None):
 def cut(raw):
     im = Image.open(io.BytesIO(raw)).convert('RGB').resize((768, 768), Image.LANCZOS)
     out = remove(im, session=SESS, post_process_mask=True)
+    al = np.array(out)[:, :, 3]
+    # tidy the mask: keep the figure and anything big touching it (drop stray sparks, coins and specks), and fill
+    # anything the figure encloses, so a white or patterned mask inside the hood never gets cut out as background
+    solid = al > 100
+    lab, k = ndimage.label(solid)
+    if k:
+        sizes = ndimage.sum(solid, lab, range(1, k + 1)); big = sizes.max()
+        keep = np.isin(lab, [i + 1 for i, v in enumerate(sizes) if v >= big * .06])
+        keep = ndimage.binary_fill_holes(keep)
+        soft = ndimage.binary_dilation(keep, iterations=2)
+        al = np.where(keep, np.maximum(al, 255), np.where(soft, al, 0)).astype(np.uint8)
+    out = Image.fromarray(np.dstack([np.array(im), al]), 'RGBA')
     a = np.array(out)
-    al = a[:, :, 3]
     ys, xs = np.where(al > 40)
     if len(xs) < 2000:
         raise ValueError('nothing cut out')
@@ -67,18 +79,26 @@ def sample():
         d = ImageDraw.Draw(sheet); d.rectangle((x + 10, y + ch - 26, x + 40, y + ch - 8), fill=meta['col']); d.text((x + 50, y + ch - 24), '#' + n, fill=(240, 236, 250))
     sheet.save(os.path.join(od, 'sheet.jpg'), quality=85)
 
+def curl(args):
+    # Hostinger's CDN answers unknown callers with a 307 back to itself and a cookie check, the same thing the deploy
+    # job works around: keep its cookie and follow the redirect
+    import subprocess
+    return subprocess.run(['curl', '-s', '-L', '--max-redirs', '5', '-c', '/tmp/cj', '-b', '/tmp/cj', '-A', UA['User-Agent']] + args, capture_output=True, timeout=120).stdout
+
 def live():
     key = os.environ.get('DEPLOY_KEY', '')
     if not key: print('no key'); return
     k = hmac.new(key.encode(), b'shadow-cut', hashlib.sha256).hexdigest()
     base = 'https://shyonsol.io/api/shadowcut.php'
-    todo = json.loads(get(base + '?a=todo&k=' + k))
-    print('to cut:', len(todo.get('rows', [])))
-    for r in todo.get('rows', [])[:300]:
+    raw = curl([base + '?a=todo&k=' + k])
+    try: todo = json.loads(raw)
+    except Exception: print('todo said', raw[:300]); return
+    rows = todo.get('rows', []); print('to cut:', len(rows))
+    for r in rows[:300]:
         try:
             data, meta, _ = cut(get(r['img']))
-            body = urllib.parse.urlencode({'a': 'put', 'k': k, 'n': r['n'], 'meta': json.dumps(meta), 'img': __import__('base64').b64encode(data).decode()}).encode()
-            print(r['n'], get(base, body, {'Content-Type': 'application/x-www-form-urlencoded'})[:120])
+            open('/tmp/cut.webp', 'wb').write(data)
+            print(r['n'], curl(['-F', 'a=put', '-F', 'k=' + k, '-F', 'n=' + r['n'], '-F', 'meta=' + json.dumps(meta), '-F', 'img=@/tmp/cut.webp;type=image/webp', base])[:120])
         except Exception as e:
             print('FAIL', r.get('n'), e)
 
