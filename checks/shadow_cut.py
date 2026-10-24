@@ -41,9 +41,14 @@ def cut(raw):
     x0, y0, x1, y1 = xs.min(), ys.min(), xs.max() + 1, ys.max() + 1
     out = out.crop((x0, y0, x1, y1))
     b = np.array(out); h, w = b.shape[:2]
-    # the hoodie: the most common opaque colour in the bottom fifth (shoulders and chest)
-    reg = b[int(h * .8):, :, :]
-    px = reg[reg[:, :, 3] > 200][:, :3]
+    # the hoodie: the colour of the outer band of the figure (hood sides and shoulders), below the top third, so the
+    # mask and goggles in the middle never decide it
+    m = b[:, :, 3] > 200
+    band = m & ~ndimage.binary_erosion(m, iterations=max(4, w // 14))
+    band[: h // 3, :] = False
+    px = b[band][:, :3]
+    if len(px) < 200:
+        reg = b[int(h * .8):, :, :]; px = reg[reg[:, :, 3] > 200][:, :3]
     col = np.median(px, axis=0) if len(px) else np.array([40, 40, 48])
     dark = np.percentile(px, 20, axis=0) if len(px) else col * .6
     # the shoulders: how far the figure reaches left and right, 90% of the way down
