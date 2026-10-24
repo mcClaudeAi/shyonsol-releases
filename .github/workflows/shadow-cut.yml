@@ -8,7 +8,7 @@ on:
     - cron: '17 */6 * * *'
   push:
     branches: [main]
-    paths: ['checks/cut-sample.txt', 'checks/shadow_cut.py']
+    paths: ['checks/cut-sample.txt', 'checks/shadow_cut.py', 'checks/cut-run.txt']
 permissions:
   contents: write
 jobs:
@@ -16,18 +16,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: { fetch-depth: 2 }
+      - id: mode
+        #MC 2026-10-24 a push that touches checks/cut-run.txt runs the live cut, so a run can be started without the Actions tab
+        run: |
+          if [ "${{ github.event_name }}" != "push" ] || git diff --name-only HEAD~1 HEAD | grep -q 'checks/cut-run.txt'; then echo "m=live" >> "$GITHUB_OUTPUT"; else echo "m=sample" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
       - run: pip install -q "rembg[cpu]==2.0.59" pillow numpy scipy
       - name: Sample
-        if: github.event_name == 'push'
+        if: steps.mode.outputs.m == 'sample'
         run: |
           python3 checks/shadow_cut.py sample
           git config user.name "shadow-cut"; git config user.email "shadow-cut@users.noreply.github.com"
           git add checks/cut-sample; git commit -q -m "Shadow cut sample" || exit 0
           git pull --rebase -q && git push -q
       - name: Live
-        if: github.event_name != 'push'
+        if: steps.mode.outputs.m == 'live'
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-        run: python3 checks/shadow_cut.py live
+        run: |
+          python3 checks/shadow_cut.py live 2>&1 | tee /tmp/cut.log
+          #MC 2026-10-24 what the run did is kept in the repo (checks/cut-last.txt), like the deploy result
+          (date -u +%FT%TZ; tail -60 /tmp/cut.log) > checks/cut-last.txt
+          git config user.name "shadow-cut"; git config user.email "shadow-cut@users.noreply.github.com"
+          git add checks/cut-last.txt; git commit -q -m "Shadow cut result" && (git pull --rebase -q && git push -q) || true
