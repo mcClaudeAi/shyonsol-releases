@@ -1,0 +1,33 @@
+#MC 2026-10-24 Living Shadows: cuts each Shadow out of its background (checks/shadow_cut.py). "sample" runs when the
+#   sample list or the script changes and commits a contact sheet to look at; the live run asks shyonsol.io which
+#   Shadows still need a cut (new holders show up as they connect), every six hours or by hand.
+name: Shadow cutouts
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * *'
+  push:
+    branches: [main]
+    paths: ['checks/cut-sample.txt', 'checks/shadow_cut.py']
+permissions:
+  contents: write
+jobs:
+  cut:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -q "rembg[cpu]==2.0.59" pillow numpy
+      - name: Sample
+        if: github.event_name == 'push'
+        run: |
+          python3 checks/shadow_cut.py sample
+          git config user.name "shadow-cut"; git config user.email "shadow-cut@users.noreply.github.com"
+          git add checks/cut-sample; git commit -q -m "Shadow cut sample" || exit 0
+          git pull --rebase -q && git push -q
+      - name: Live
+        if: github.event_name != 'push'
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: python3 checks/shadow_cut.py live
