@@ -1,5 +1,7 @@
 name: Build Android app
-# The Android app for the Solana dApp Store: a Trusted Web Activity of shyonsol.io built with Bubblewrap.
+# The Android app for the Solana dApp Store: a web shell (WebView) of shyonsol.io built with Solana Mobile's webshell CLI,
+# which hands wallet requests to the phone's wallet through Mobile Wallet Adapter. (The first version was a Trusted Web
+# Activity; the store now recommends the web shell because browsers are blocking the local wallet link TWAs rely on.)
 # Runs when anything in twa/ changes, or by hand. The signed APK lands on a GitHub Release.
 on:
   push:
@@ -16,15 +18,9 @@ jobs:
       - uses: actions/setup-java@v5
         with: { distribution: temurin, java-version: '17' }
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - name: Bubblewrap
+        with: { node-version: '22' }
+      - name: Android SDK licenses
         run: |
-          npm i -g @bubblewrap/cli@1.27.0
-          mkdir -p ~/.bubblewrap
-          printf '{"jdkPath":"%s","androidSdkPath":"%s"}' "$JAVA_HOME" "$ANDROID_HOME" > ~/.bubblewrap/config.json
-          # Bubblewrap looks for the SDK tools in <sdk>/bin; the runner keeps them in cmdline-tools/latest
-          [ -e "$ANDROID_HOME/bin" ] || sudo ln -s "$ANDROID_HOME/cmdline-tools/latest/bin" "$ANDROID_HOME/bin"
-          ls -la "$ANDROID_HOME/bin/sdkmanager"
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
       - name: Signing key
         env:
@@ -44,11 +40,18 @@ jobs:
       - name: Build
         run: |
           cd twa
-          export BUBBLEWRAP_KEYSTORE_PASSWORD="$KS_PASS" BUBBLEWRAP_KEY_PASSWORD="$KS_PASS"
+          export SOLANA_MOBILE_KEYSTORE_PASSWORD="$KS_PASS" SOLANA_MOBILE_KEY_PASSWORD="$KS_PASS"
+          VN=$(python3 -c "import json;print(json.load(open('twa-manifest.json'))['appVersionName'])")
+          VC=$(python3 -c "import json;print(json.load(open('twa-manifest.json'))['appVersionCode'])")
           set -o pipefail
-          bubblewrap update --skipVersionUpgrade 2>&1 | tee ../bw-update.log
-          bubblewrap build --skipPwaValidation 2>&1 | tee ../bw-build.log
-          ls -la *.apk *.aab
+          # the web shell: a WebView app that opens the game and hands wallet requests to the phone's wallet (Mobile Wallet Adapter)
+          npx --yes solana-mobile@latest webshell init shell --force --manifest ./twa-manifest.json --url "https://shyonsol.io/play?src=app" \
+            --app-name "Shilluminati" --application-id io.shyonsol.twa --version-name "$VN" --version-code "$VC" \
+            --keystore-path "$PWD/shy-release.keystore" --keystore-alias shy 2>&1 | tee ../bw-update.log
+          # our icon, splash and colors over the generated defaults
+          cp -r res/. shell/app/src/main/res/
+          npx --yes solana-mobile@latest webshell build shell --stacktrace 2>&1 | tee ../bw-build.log
+          ls -la shell/app/build/outputs/apk/release/
       - name: Report a failure
         if: failure()
         run: |
@@ -61,7 +64,7 @@ jobs:
           cd twa
           V=$(python3 -c "import json;d=json.load(open('twa-manifest.json'));print(d['appVersionName']+'-'+str(d['appVersionCode']))")
           TAG="android-$V-$KIND-${GITHUB_RUN_NUMBER}"
-          cp app-release-signed.apk "shilluminati-$V-$KIND.apk"
+          cp shell/app/build/outputs/apk/release/app-release.apk "shilluminati-$V-$KIND.apk"
           SHA=$(keytool -list -v -keystore shy-release.keystore -storepass "$KS_PASS" | grep 'SHA256:' | head -1 | awk '{print $2}')
           gh release create "$TAG" "shilluminati-$V-$KIND.apk" --title "Android app $V ($KIND)" \
-            --notes "Built by Bubblewrap from twa/twa-manifest.json. Signing certificate SHA-256: $SHA" $( [ "$KIND" = test ] && echo --prerelease )
+            --notes "Built as a web shell (solana-mobile webshell) from twa/twa-manifest.json. Signing certificate SHA-256: $SHA" $( [ "$KIND" = test ] && echo --prerelease )
