@@ -66,7 +66,7 @@ jobs:
           if [ -x "$AAPT" ]; then
             L=$("$AAPT" dump badging shell/app/build/outputs/apk/release/app-release.apk | grep '^locales:' | tr -d "'" | cut -d: -f2)
             echo "::notice title=APK languages::$L"
-            for x in $L; do case "${x%%-*}" in --_--|en|tr|es|pt|fr|de|ru|vi|in|id|zh|ko|fa) ;; *) echo "::error::APK still declares $x"; exit 1;; esac; done
+            for x in $L; do [ "$x" = "--_--" ] && continue; case "${x%%-*}" in en|tr|es|pt|fr|de|ru|vi|in|id|zh|ko|fa) ;; *) echo "::error::APK still declares $x"; exit 1;; esac; done
           fi
       - name: Report a failure
         if: failure()
