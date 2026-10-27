@@ -50,8 +50,24 @@ jobs:
             --keystore-path "$PWD/shy-release.keystore" --keystore-alias shy 2>&1 | tee ../bw-update.log
           # our icon, splash and colors over the generated defaults
           cp -r res/. shell/app/src/main/res/
+          #MC 2026-10-27 the store rejected 1.0.0 and 1.0.1 for terms "in the languages your app supports". It reads the
+          #   languages from the APK, and the AndroidX libraries ship 85 of them, so the APK claimed Japanese, Arabic,
+          #   Hindi and the rest. Keep only the 12 the site and its Terms of use are written in (Android calls Indonesian "in").
+          python3 - <<'PY'
+          p = 'shell/app/build.gradle.kts'; s = open(p).read()
+          add = 'android {\n    androidResources {\n        localeFilters += setOf("en", "tr", "es", "pt", "fr", "de", "ru", "vi", "in", "zh", "ko", "fa")\n    }\n'
+          assert s.count('\nandroid {\n') == 1, 'android block not found in build.gradle.kts'
+          open(p, 'w').write(s.replace('\nandroid {\n', '\n' + add, 1)); print('locale filter added')
+          PY
           npx --yes solana-mobile@latest webshell build shell --stacktrace 2>&1 | tee ../bw-build.log
           ls -la shell/app/build/outputs/apk/release/
+          # the languages the store will see: only ours, or stop here
+          AAPT=$(ls -d "$ANDROID_HOME"/build-tools/*/ 2>/dev/null | sort -V | tail -1)aapt2
+          if [ -x "$AAPT" ]; then
+            L=$("$AAPT" dump badging shell/app/build/outputs/apk/release/app-release.apk | grep '^locales:' | tr -d "'" | cut -d: -f2)
+            echo "::notice title=APK languages::$L"
+            for x in $L; do case "${x%%-*}" in --_--|en|tr|es|pt|fr|de|ru|vi|in|id|zh|ko|fa) ;; *) echo "::error::APK still declares $x"; exit 1;; esac; done
+          fi
       - name: Report a failure
         if: failure()
         run: |
