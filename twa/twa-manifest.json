@@ -18,8 +18,8 @@
   "maskableIconUrl": "https://shyonsol.io/assets/art/app-maskable-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": { "path": "./shy-release.keystore", "alias": "shy" },
-  "appVersionName": "1.0.0",
-  "appVersionCode": 1,
+  "appVersionName": "1.0.1",
+  "appVersionCode": 2,
   "shortcuts": [
     { "name": "Daily Challenge", "shortName": "Daily", "url": "/play?daily=1", "chosenIconUrl": "https://shyonsol.io/assets/art/app-any-192.png" },
     { "name": "Fight the Shogun", "shortName": "Shogun", "url": "/play?boss=1", "chosenIconUrl": "https://shyonsol.io/assets/art/app-any-192.png" }
