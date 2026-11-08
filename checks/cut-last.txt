@@ -1,5 +1,61 @@
-2026-11-08T07:19:00Z
-[0;93m2026-11-08 07:18:19.570090655 [W:onnxruntime:Default, device_discovery.cc:95 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
-Downloading data from 'https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx' to file '/home/runner/.u2net/isnet-general-use.onnx'.
-  0%|                                               | 0.00/179M [00:00<?, ?B/s]  6%|██▌                                    | 11.6M/179M [00:00<00:01, 116MB/s] 15%|█████▋                                 | 26.0M/179M [00:00<00:01, 132MB/s] 23%|████████▊                              | 40.4M/179M [00:00<00:01, 138MB/s] 31%|███████████▉                           | 54.7M/179M [00:00<00:00, 140MB/s] 39%|███████████████                        | 69.1M/179M [00:00<00:00, 141MB/s] 47%|██████████████████▏                    | 83.5M/179M [00:00<00:00, 142MB/s] 55%|█████████████████████▎                 | 97.9M/179M [00:00<00:00, 143MB/s] 63%|█████████████████████████               | 112M/179M [00:00<00:00, 143MB/s] 71%|████████████████████████████▎           | 127M/179M [00:00<00:00, 143MB/s] 79%|███████████████████████████████▌        | 141M/179M [00:01<00:00, 143MB/s] 87%|██████████████████████████████████▊     | 155M/179M [00:01<00:00, 144MB/s] 95%|██████████████████████████████████████  | 170M/179M [00:01<00:00, 144MB/s]  0%|                                               | 0.00/179M [00:00<?, ?B/s]100%|███████████████████████████████████████| 179M/179M [00:00<00:00, 1.00TB/s]
-to cut: 0
+2026-11-08T13:08:17Z
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/requests/adapters.py", line 696, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/urllib3/connectionpool.py", line 847, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/urllib3/util/retry.py", line 510, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/urllib3/connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/urllib3/connectionpool.py", line 542, in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/urllib3/connectionpool.py", line 373, in _raise_timeout
+    raise ReadTimeoutError(
+urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='github.com', port=443): Read timed out. (read timeout=30)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/work/shyonsol-releases/shyonsol-releases/checks/shadow_cut.py", line 14, in <module>
+    SESS = new_session('isnet-general-use')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/rembg/session_factory.py", line 44, in new_session
+    return session_class(model_name, sess_opts, providers, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/rembg/sessions/base.py", line 35, in __init__
+    str(self.__class__.download_models(*args, **kwargs)),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/rembg/sessions/dis_general_use.py", line 58, in download_models
+    pooch.retrieve(
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/pooch/core.py", line 242, in retrieve
+    stream_download(url, full_path, known_hash, downloader, pooch=None)
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/pooch/core.py", line 823, in stream_download
+    downloader(url, tmp, pooch)
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/pooch/downloaders.py", line 230, in __call__
+    response = requests.get(url, timeout=timeout, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/requests/api.py", line 87, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/requests/api.py", line 71, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/requests/sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/requests/sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/site-packages/requests/adapters.py", line 742, in send
+    raise ReadTimeout(e, request=request)
+requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='github.com', port=443): Read timed out. (read timeout=30)
